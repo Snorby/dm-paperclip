@@ -10,8 +10,7 @@ module Paperclip
       # * +greater_than+: equivalent to :in => options[:greater_than]..Infinity
       # * +message+: error message to display, use :min and :max as replacements
       def validates_attachment_size(*fields)
-        opts = opts_from_validator_args(fields)
-        add_validator_to_context(opts, fields, Paperclip::Validate::SizeValidator)
+        validators.add SizeValidator, *fields
       end
 
       # Adds errors if thumbnail creation fails. The same as specifying :whiny_thumbnails => true.
@@ -21,8 +20,7 @@ module Paperclip
 
       # Places ActiveRecord-style validations on the presence of a file.
       def validates_attachment_presence(*fields)
-        opts = opts_from_validator_args(fields)
-        add_validator_to_context(opts, fields, Paperclip::Validate::RequiredFieldValidator)
+        validators.add RequiredFieldValidator, *fields
       end
 
       # Places ActiveRecord-style validations on the content type of the file assigned. The
@@ -30,13 +28,12 @@ module Paperclip
       # * +content_type+: Allowed content types.  Can be a single content type or an array.  Allows all by default.
       # * +message+: The message to display when the uploaded file has an invalid content type.
       def validates_attachment_content_type(*fields)
-        opts = opts_from_validator_args(fields)
-        add_validator_to_context(opts, fields, Paperclip::Validate::ContentTypeValidator)
+        validators.add ContentTypeValidator, *fields
       end
 
     end
 
-    class SizeValidator < DataMapper::Validate::GenericValidator #:nodoc:
+    class SizeValidator < DataMapper::Validations::GenericValidator #:nodoc:
       def initialize(field_name, options={})
         super
         @field_name, @options = field_name, options
@@ -59,7 +56,7 @@ module Paperclip
       end
     end
 
-    class RequiredFieldValidator < DataMapper::Validate::GenericValidator #:nodoc:
+    class RequiredFieldValidator < DataMapper::Validations::GenericValidator #:nodoc:
       def initialize(field_name, options={})
         super
         @field_name, @options = field_name, options
@@ -76,7 +73,7 @@ module Paperclip
       end
     end
 
-    class ContentTypeValidator < DataMapper::Validate::GenericValidator #:nodoc:
+    class ContentTypeValidator < DataMapper::Validations::GenericValidator #:nodoc:
       def initialize(field_name, options={})
         super
         @field_name, @options = field_name, options
@@ -102,7 +99,7 @@ module Paperclip
       end
     end
 
-    class CopyAttachmentErrors < DataMapper::Validate::GenericValidator #:nodoc:
+    class CopyAttachmentErrors < DataMapper::Validations::GenericValidator #:nodoc:
       def initialize(field_name, options={})
         super
         @field_name, @options = field_name, options
